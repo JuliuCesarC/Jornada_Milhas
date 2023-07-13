@@ -31,9 +31,21 @@ public class Testimonial {
   
   private String testimonial;
 
+  private Boolean active = true;
+
   public Testimonial(CreateTestimonialDto createDto) throws IOException {
     this.name = createDto.name();
     this.picture = createDto.picture().getBytes();
     this.testimonial = createDto.testimonial();
+  }
+
+  public void update(UpdateTestimonialDto updateDto) throws IOException {
+    this.name = updateDto.name();
+    this.picture = updateDto.picture().getBytes();
+    this.testimonial = updateDto.testimonial();
+  }
+
+  public void delete() {
+    this.active = false;
   }
 }
