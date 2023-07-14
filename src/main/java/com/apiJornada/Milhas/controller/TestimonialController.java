@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.apiJornada.Milhas.domain.testimonial.CreateTestimonialDto;
@@ -38,9 +39,13 @@ public class TestimonialController {
 
   @PostMapping(consumes = { "multipart/form-data" })
   @Transactional
-  public ResponseEntity<URI> createTestimonial(@Valid CreateTestimonialDto createDto, UriComponentsBuilder uriBuilder)
+  public ResponseEntity<URI> createTestimonial(MultipartFile picture, @Valid CreateTestimonialDto dto,
+      UriComponentsBuilder uriBuilder)
       throws IOException {
-    var testimonial = new Testimonial(createDto);
+    if (picture == null) {
+      throw new RuntimeException("Arquivo não estar vazio.");
+    }
+    var testimonial = new Testimonial(dto, picture);
     repositoryTestimonial.save(testimonial);
 
     var uri = uriBuilder.path("/depoimentos/{id}").buildAndExpand(testimonial.getId()).toUri();

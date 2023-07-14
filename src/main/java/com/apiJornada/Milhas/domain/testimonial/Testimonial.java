@@ -2,6 +2,8 @@ package com.apiJornada.Milhas.domain.testimonial;
 
 import java.io.IOException;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -33,9 +35,9 @@ public class Testimonial {
 
   private Boolean active = true;
 
-  public Testimonial(CreateTestimonialDto createDto) throws IOException {
+  public Testimonial(CreateTestimonialDto createDto, MultipartFile file) throws IOException {
     this.name = createDto.name();
-    this.picture = createDto.picture().getBytes();
+    this.picture = file.getBytes();
     this.testimonial = createDto.testimonial();
   }
 
