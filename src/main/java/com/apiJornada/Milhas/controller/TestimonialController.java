@@ -28,6 +28,7 @@ import com.apiJornada.Milhas.domain.testimonial.UpdateTestimonialDto;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping("depoimentos")
@@ -39,11 +40,11 @@ public class TestimonialController {
 
   @PostMapping(consumes = { "multipart/form-data" })
   @Transactional
-  public ResponseEntity<URI> createTestimonial(MultipartFile picture, @Valid CreateTestimonialDto dto,
+  public ResponseEntity<String> createTestimonial(MultipartFile picture, @Valid CreateTestimonialDto dto,
       UriComponentsBuilder uriBuilder)
       throws IOException {
     if (picture == null) {
-      throw new RuntimeException("Arquivo não estar vazio.");
+      return ResponseEntity.badRequest().body("Arquivo não deve estar vazio.");
     }
     var testimonial = new Testimonial(dto, picture);
     repositoryTestimonial.save(testimonial);

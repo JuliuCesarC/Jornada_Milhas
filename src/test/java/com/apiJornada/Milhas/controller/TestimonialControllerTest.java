@@ -60,38 +60,19 @@ public class TestimonialControllerTest {
   @DisplayName("Deveria devolver código http 201 quando o Media Type e os dados enviados estiverem corretos")
   void testCreateTestimonial_03() throws Exception {
     MockMultipartFile file = new MockMultipartFile(
-        "text",
+        "picture",
         "teste.txt",
-        MediaType.TEXT_PLAIN_VALUE,
+        MediaType.IMAGE_PNG_VALUE,
         "Hello, World!".getBytes());
+    var createDto = new CreateTestimonialDto("Teste nome", "Qualquer coisa");
 
-    var createDto = new CreateTestimonialDto("Nofghdfghf", "Qualquer coisa");
-
-    var response = mvc.perform(post("/depoimentos")
-        .contentType(MediaType.MULTIPART_FORM_DATA)
-        .content(createTestimonialDto.write(createDto).getJson()))
+    var response = mvc.perform(multipart("/depoimentos").file(file)
+        .param("name", createDto.name())
+        .param("testimonial", createDto.testimonial()))
         .andReturn().getResponse();
 
     assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
   }
-
-  // @Test
-  // @DisplayName("Deveria devolver código http 201 quando o Media Type e os dados
-  // enviados estiverem corretos")
-  // void testCreateTestimonial_03() throws Exception {
-  // byte[] inputArray = "Test Testimonial".getBytes();
-  // MockMultipartFile mockMultipartFile = new
-  // MockMultipartFile("fileName",inputArray);
-  // var createDto = new CreateTestimonialDto("Teste", mockMultipartFile, "Teste
-  // T");
-
-  // var response = mvc.perform(post("/depoimentos")
-  // .contentType(MediaType.MULTIPART_FORM_DATA)
-  // .content(createTestimonialJson.write(createDto).getJson()))
-  // .andReturn().getResponse();
-
-  // assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-  // }
 
   @Test
   void testDeleteTestimonial() {
