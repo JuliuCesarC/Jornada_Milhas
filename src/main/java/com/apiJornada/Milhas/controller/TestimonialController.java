@@ -1,7 +1,6 @@
 package com.apiJornada.Milhas.controller;
 
 import java.io.IOException;
-import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.apiJornada.Milhas.domain.testimonial.CreateTestimonialDto;
@@ -28,7 +26,6 @@ import com.apiJornada.Milhas.domain.testimonial.UpdateTestimonialDto;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping("depoimentos")
@@ -40,13 +37,10 @@ public class TestimonialController {
 
   @PostMapping(consumes = { "multipart/form-data" })
   @Transactional
-  public ResponseEntity<String> createTestimonial(MultipartFile picture, @Valid CreateTestimonialDto dto,
+  public ResponseEntity<String> createTestimonial(@Valid CreateTestimonialDto dto,
       UriComponentsBuilder uriBuilder)
       throws IOException {
-    if (picture == null) {
-      return ResponseEntity.badRequest().body("Arquivo não deve estar vazio.");
-    }
-    var testimonial = new Testimonial(dto, picture);
+    var testimonial = new Testimonial(dto);
     repositoryTestimonial.save(testimonial);
 
     var uri = uriBuilder.path("/depoimentos/{id}").buildAndExpand(testimonial.getId()).toUri();
@@ -89,7 +83,7 @@ public class TestimonialController {
 
   @DeleteMapping("/{id}")
   @Transactional
-  public ResponseEntity<?> deleteTestimonial(@PathVariable Long id) throws IOException {
+  public ResponseEntity<String> deleteTestimonial(@PathVariable Long id) throws IOException {
     Testimonial testimonial = repositoryTestimonial.findById(id).get();
     testimonial.delete();
 
