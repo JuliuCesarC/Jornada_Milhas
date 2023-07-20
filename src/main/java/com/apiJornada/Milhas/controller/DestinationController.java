@@ -1,12 +1,12 @@
 package com.apiJornada.Milhas.controller;
 
 import java.io.IOException;
-import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import com.apiJornada.Milhas.domain.destination.CreateDestinationDto;
@@ -48,19 +50,25 @@ public class DestinationController {
     return ResponseEntity.created(uri).build();
   }
 
-  // @GetMapping
-  // public ResponseEntity<Page<ListDestinationDto>> filterListDestination(
-  //     @PageableDefault(size = 10, sort = { "name" }) Pageable pagination) {
-  //   var dto = repositoryDestination.findAllByActiveTrue(pagination);
+  @GetMapping("/buscar")
+  public ResponseEntity<Page<ListDestinationDto>> searchByNameDestination(
+      @RequestParam String name,
+      @PageableDefault(size = 2, sort = { "name" }) Pageable pagination) {
+    var listDto = repositoryDestination.findAllByNameLikeAndActiveTrue(name + "%", pagination);
 
-  //   return ResponseEntity.ok(dto);
-  // }
+    if (listDto.getContent().size() < 1) {
+      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nenhum destino foi encontrado");
+    }
+
+    return ResponseEntity.ok(listDto);
+  }
+
   @GetMapping
   public ResponseEntity<Page<ListDestinationDto>> listDestination(
       @PageableDefault(size = 10, sort = { "name" }) Pageable pagination) {
-    var dto = repositoryDestination.findAllByActiveTrue(pagination);
+    var listDto = repositoryDestination.findAllByActiveTrue(pagination);
 
-    return ResponseEntity.ok(dto);
+    return ResponseEntity.ok(listDto);
   }
 
   @GetMapping("/{id}")
@@ -79,13 +87,13 @@ public class DestinationController {
     return ResponseEntity.ok(dto);
   }
 
-    @PutMapping(consumes = { "multipart/form-data" })
+  @PutMapping(consumes = { "multipart/form-data" })
   @Transactional
   public ResponseEntity<ListDestinationDto> updateDestination(@Valid UpdateDestinationDto updateDto)
-  throws IOException {
+      throws IOException {
     var destination = repositoryDestination.findById(updateDto.id()).get();
     destination.update(updateDto);
-    
+
     return ResponseEntity.ok().body(new ListDestinationDto(destination));
   }
 
