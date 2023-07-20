@@ -28,9 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
-import org.springframework.web.context.WebApplicationContext;
 
-import com.apiJornada.Milhas.domain.testimonial.CreateTestimonialDto;
 import com.apiJornada.Milhas.domain.testimonial.ListTestimonialDto;
 import com.apiJornada.Milhas.domain.testimonial.Testimonial;
 import com.apiJornada.Milhas.domain.testimonial.TestimonialRepository;
@@ -44,16 +42,10 @@ public class TestimonialControllerTest {
   private MockMvc mvc;
 
   @Autowired
-  private JacksonTester<CreateTestimonialDto> createTestimonialDto;
-
-  @Autowired
   private JacksonTester<ListTestimonialDto> listTestimonialDto;
 
   @MockBean
   private TestimonialRepository repositoryTestimonial;
-
-  @Autowired
-  private WebApplicationContext webApplicationContext;
 
   private String id = "111";
   private String name = "11111";
@@ -85,7 +77,7 @@ public class TestimonialControllerTest {
   @DisplayName("Deveria devolver código http 201 quando o Media Type e os dados enviados estiverem corretos.")
   void testCreateTestimonial_03() throws Exception {
 
-    var response = mvc.perform(multipart("/depoimentos").file(createMultiPartFile())
+    var response = mvc.perform(multipart("/depoimentos").file(createMockMultipartFile())
         .param(this.nameField, this.name)
         .param(this.testimonialField, this.testimonial))
         .andReturn().getResponse();
@@ -168,7 +160,7 @@ public class TestimonialControllerTest {
       }
     });
     var response = mvc.perform(builder
-        .file(createMultiPartFile())
+        .file(createMockMultipartFile())
         .param(this.idField, this.id)
         .param(this.nameField, this.name)
         .param(this.testimonialField, this.testimonial))
@@ -200,7 +192,7 @@ public class TestimonialControllerTest {
     assertThat(response.getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
   }
 
-  MockMultipartFile createMultiPartFile() {
+  MockMultipartFile createMockMultipartFile() {
     return new MockMultipartFile(
         this.pictureField,
         "teste.txt",
@@ -209,6 +201,6 @@ public class TestimonialControllerTest {
   }
 
   Testimonial createTestimonial() throws NumberFormatException, IOException {
-    return new Testimonial(Long.valueOf(this.id), this.name, createMultiPartFile().getBytes(), this.testimonial, true);
+    return new Testimonial(Long.valueOf(this.id), this.name, createMockMultipartFile().getBytes(), this.testimonial, true);
   }
 }

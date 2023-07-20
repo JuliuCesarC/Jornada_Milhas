@@ -1,6 +1,7 @@
 package com.apiJornada.Milhas.controller;
 
 import java.io.IOException;
+import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -37,7 +38,7 @@ public class TestimonialController {
 
   @PostMapping(consumes = { "multipart/form-data" })
   @Transactional
-  public ResponseEntity<String> createTestimonial(@Valid CreateTestimonialDto dto,
+  public ResponseEntity<URI> createTestimonial(@Valid CreateTestimonialDto dto,
       UriComponentsBuilder uriBuilder)
       throws IOException {
     var testimonial = new Testimonial(dto);
@@ -64,29 +65,30 @@ public class TestimonialController {
   }
 
   @GetMapping("/detail")
+  // @Secured({ "ROLE_ADMIN", "ROLE_MANAGER" })
   public ResponseEntity<Page<DetailTestimonialDto>> detailTestimonial(
-      @PageableDefault(size = 10, sort = { "name" }) Pageable pagination) {
-    var dto = repositoryTestimonial.findAll(pagination).map(DetailTestimonialDto::new);
+    @PageableDefault(size = 10, sort = { "name" }) Pageable pagination) {
+      var dto = repositoryTestimonial.findAll(pagination).map(DetailTestimonialDto::new);
 
     return ResponseEntity.ok(dto);
   }
-
+  
   @PutMapping(consumes = { "multipart/form-data" })
   @Transactional
   public ResponseEntity<ListTestimonialDto> updateTestimonial(@Valid UpdateTestimonialDto updateDto)
-      throws IOException {
+  throws IOException {
     Testimonial testimonial = repositoryTestimonial.findById(updateDto.id()).get();
     testimonial.update(updateDto);
-
+    
     return ResponseEntity.ok().body(new ListTestimonialDto(testimonial));
   }
 
   @DeleteMapping("/{id}")
+  // @Secured({ "ROLE_ADMIN", "ROLE_MANAGER" })
   @Transactional
   public ResponseEntity<String> deleteTestimonial(@PathVariable Long id) throws IOException {
     Testimonial testimonial = repositoryTestimonial.findById(id).get();
     testimonial.delete();
-
     return ResponseEntity.noContent().build();
   }
 }

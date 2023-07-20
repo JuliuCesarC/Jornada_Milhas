@@ -13,3 +13,7 @@ delete from flyway_schema_history where success = 0;
 select * from client_testimonial;
 
 delete from client_testimonial where id > 0;
+
+-- Destination --------------
+
+SELECT * FROM destination;
