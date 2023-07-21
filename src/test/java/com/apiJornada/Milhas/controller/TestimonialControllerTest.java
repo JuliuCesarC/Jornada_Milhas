@@ -47,18 +47,21 @@ public class TestimonialControllerTest {
   @MockBean
   private TestimonialRepository repositoryTestimonial;
 
-  private String id = "111";
-  private String name = "11111";
-  private String testimonial = "11111111";
-  private String idField = "id";
-  private String pictureField = "picture";
-  private String nameField = "name";
-  private String testimonialField = "testimonial";
+  private final String URL = "/depoimentos";
+  private final String URL_ROUTE_ID = "/depoimentos/";
+
+  private final String id = "111";
+  private final String name = "11111";
+  private final String testimonial = "11111111";
+  private final String idField = "id";
+  private final String pictureField = "picture";
+  private final String nameField = "name";
+  private final String testimonialField = "testimonial";
 
   @Test
   @DisplayName("Deveria devolver código http 415 quando não enviado o Media Type correto.")
   void testCreateTestimonial_01() throws Exception {
-    var response = mvc.perform(post("/depoimentos")).andReturn().getResponse();
+    var response = mvc.perform(post(URL)).andReturn().getResponse();
 
     assertThat(response.getStatus()).isEqualTo(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value());
   }
@@ -66,7 +69,7 @@ public class TestimonialControllerTest {
   @Test
   @DisplayName("Deveria devolver código http 400 quando o Media Type enviado estiver correto, mas os dados estiverem errados.")
   void testCreateTestimonial_02() throws Exception {
-    var response = mvc.perform(post("/depoimentos")
+    var response = mvc.perform(post(URL)
         .contentType(MediaType.MULTIPART_FORM_DATA))
         .andReturn().getResponse();
 
@@ -77,7 +80,7 @@ public class TestimonialControllerTest {
   @DisplayName("Deveria devolver código http 201 quando o Media Type e os dados enviados estiverem corretos.")
   void testCreateTestimonial_03() throws Exception {
 
-    var response = mvc.perform(multipart("/depoimentos").file(createMockMultipartFile())
+    var response = mvc.perform(multipart(URL).file(createMockMultipartFile())
         .param(this.nameField, this.name)
         .param(this.testimonialField, this.testimonial))
         .andReturn().getResponse();
@@ -88,7 +91,7 @@ public class TestimonialControllerTest {
   @Test
   @DisplayName("Deveria devolver código http 200 quando efetuado a requisição.")
   void testListTestimonial_01() throws Exception {
-    var response = mvc.perform(get("/depoimentos")).andReturn().getResponse();
+    var response = mvc.perform(get(URL)).andReturn().getResponse();
 
     assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
   }
@@ -96,7 +99,7 @@ public class TestimonialControllerTest {
   @Test
   @DisplayName("Deveria devolver código http 404 quando não enviado o id.")
   void testSearchTestimonialById_01() throws Exception {
-    var response = mvc.perform(get("/depoimentos/")).andReturn().getResponse();
+    var response = mvc.perform(get(URL_ROUTE_ID)).andReturn().getResponse();
 
     assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
   }
@@ -109,7 +112,7 @@ public class TestimonialControllerTest {
 
     when(repositoryTestimonial.findByIdAndActiveTrue(any())).thenReturn(testimonial);
 
-    var response = mvc.perform(get("/depoimentos/111")).andReturn().getResponse();
+    var response = mvc.perform(get(URL_ROUTE_ID + id)).andReturn().getResponse();
 
     assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
     var responseJson = listTestimonialDto.write(listTestimonial).getJson();
@@ -119,7 +122,7 @@ public class TestimonialControllerTest {
   @Test
   @DisplayName("Deveria devolver código http 415 quando não enviado o Media Type correto")
   void testUpdateTestimonial_01() throws Exception {
-    var response = mvc.perform(put("/depoimentos")).andReturn().getResponse();
+    var response = mvc.perform(put(URL)).andReturn().getResponse();
 
     assertThat(response.getStatus()).isEqualTo(HttpStatus.UNSUPPORTED_MEDIA_TYPE.value());
   }
@@ -127,7 +130,7 @@ public class TestimonialControllerTest {
   @Test
   @DisplayName("Deveria devolver código http 400 quando o Media Type enviado estiver correto, mas os dados estiverem errados.")
   void testUpdateTestimonial_02() throws Exception {
-    var response = mvc.perform(put("/depoimentos")
+    var response = mvc.perform(put(URL)
         .contentType(MediaType.MULTIPART_FORM_DATA))
         .andReturn().getResponse();
 
@@ -146,7 +149,7 @@ public class TestimonialControllerTest {
     // CONFIGURANDO A REQUISIÇÃO DO TIPO MULTIPART PARA O VERBO PUT
 
     // Criamos uma requisição do tipo Multipart para a rota informada.
-    MockMultipartHttpServletRequestBuilder builder = MockMvcRequestBuilders.multipart("/depoimentos");
+    MockMultipartHttpServletRequestBuilder builder = MockMvcRequestBuilders.multipart(URL);
     // Executamos o "builder.with()" para podermos adicionar a interface
     // "RequestPostProcessor", que nos permite manipular a requisição antes de ela
     // ser enviada.
@@ -175,7 +178,7 @@ public class TestimonialControllerTest {
   @Test
   @DisplayName("Deveria devolver código http 404 quando não enviado o id.")
   void testDeleteTestimonial_01() throws Exception {
-    var response = mvc.perform(delete("/depoimentos/")).andReturn().getResponse();
+    var response = mvc.perform(delete(URL_ROUTE_ID)).andReturn().getResponse();
 
     assertThat(response.getStatus()).isEqualTo(HttpStatus.NOT_FOUND.value());
   }
@@ -186,8 +189,8 @@ public class TestimonialControllerTest {
 
     Optional<Testimonial> testimonial = Optional.of(createTestimonial());
     when(repositoryTestimonial.findById(any())).thenReturn(testimonial);
-    
-    var response = mvc.perform(delete("/depoimentos/"+this.id)).andReturn().getResponse();
+
+    var response = mvc.perform(delete(URL_ROUTE_ID + id)).andReturn().getResponse();
 
     assertThat(response.getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
   }
@@ -195,12 +198,13 @@ public class TestimonialControllerTest {
   MockMultipartFile createMockMultipartFile() {
     return new MockMultipartFile(
         this.pictureField,
-        "teste.txt",
+        "teste.png",
         MediaType.IMAGE_PNG_VALUE,
         "Hello, World!".getBytes());
   }
 
   Testimonial createTestimonial() throws NumberFormatException, IOException {
-    return new Testimonial(Long.valueOf(this.id), this.name, createMockMultipartFile().getBytes(), this.testimonial, true);
+    return new Testimonial(Long.valueOf(this.id), this.name, createMockMultipartFile().getBytes(), this.testimonial,
+        true);
   }
 }
