@@ -40,9 +40,15 @@ public class Destination {
   }
 
   public void update(UpdateDestinationDto upDto) throws IOException {
-    this.picture = upDto.picture().getBytes();
-    this.name = upDto.name();
-    this.price = upDto.price();
+    if(upDto.picture() != null){
+      this.picture = upDto.picture().getBytes();
+    }
+    if(upDto.name() != null){
+      this.name = upDto.name();
+    }
+    if(upDto.price() != null){
+      this.price = upDto.price();
+    }
   }
 
   public void disable(){

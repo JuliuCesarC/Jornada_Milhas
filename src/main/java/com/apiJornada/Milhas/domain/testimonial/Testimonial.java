@@ -20,15 +20,14 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(of = "id")
 public class Testimonial {
 
-  
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  
+
   private String name;
-  
+
   private byte[] picture;
-  
+
   private String testimonial;
 
   private Boolean active = true;
@@ -40,9 +39,15 @@ public class Testimonial {
   }
 
   public void update(UpdateTestimonialDto updateDto) throws IOException {
-    this.name = updateDto.name();
-    this.picture = updateDto.picture().getBytes();
-    this.testimonial = updateDto.testimonial();
+    if (updateDto.name() != null) {
+      this.name = updateDto.name();
+    }
+    if (updateDto.picture() != null) {
+      this.picture = updateDto.picture().getBytes();
+    }
+    if (updateDto.testimonial() != null) {
+      this.testimonial = updateDto.testimonial();
+    }
   }
 
   public void delete() {

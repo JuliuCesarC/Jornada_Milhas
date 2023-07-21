@@ -17,3 +17,9 @@ delete from client_testimonial where id > 0;
 -- Destination --------------
 
 SELECT * FROM destination;
+
+SELECT * FROM destination WHERE name LIKE 'natal r%';
+
+
+
+
