@@ -10,7 +10,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,8 +24,6 @@ import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletRequest;
@@ -39,9 +36,6 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import com.apiJornada.Milhas.domain.destination.Destination;
 import com.apiJornada.Milhas.domain.destination.DestinationRepository;
 import com.apiJornada.Milhas.domain.destination.ListDestinationDto;
-import com.apiJornada.Milhas.domain.testimonial.ListTestimonialDto;
-import com.apiJornada.Milhas.domain.testimonial.Testimonial;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest
@@ -64,11 +58,13 @@ public class DestinationControllerTest {
 
   private final String id = "111";
   private final String name = "paris";
-  private final double price = 1111.11;
+  private final String target = "1111111111";
+  private final String description = "111111111111111";
   private final String idField = "id";
   private final String nameField = "name";
-  private final String priceField = "price";
-  private final String pictureField = "picture";
+  private final String targetField = "target";
+  private final String imageField1 = "image1";
+  private final String imageField2 = "image2";
 
   @Test
   @DisplayName("Deveria devolver código http 415 quando não enviado o Media Type correto.")
@@ -92,9 +88,11 @@ public class DestinationControllerTest {
   @DisplayName("Deveria devolver código http 201 quando o Media Type e os dados enviados estiverem corretos.")
   void testCreateDestination_03() throws Exception {
 
-    var response = mvc.perform(multipart(URL).file(createMockMultipartFile())
+    var response = mvc.perform(multipart(URL)
+        .file(createMockMultipartFile_01())
+        .file(createMockMultipartFile_02())
         .param(this.nameField, this.name)
-        .param(this.priceField, String.valueOf(this.price)))
+        .param(this.targetField, this.target))
         .andReturn().getResponse();
 
     assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
@@ -147,9 +145,12 @@ public class DestinationControllerTest {
 
     ObjectMapper objectMapper = new ObjectMapper();
     String jsonPage = objectMapper.writeValueAsString(pagedResponse);
-    // Serializa o objeto "pagedResponse" para comparar com o retorno da rota. Não utilizamos a propriedade "JacksonTester<>" como
-    // em alguns outros métodos, pois a ordem dos campos na serializadão do "ObjectMapper" e do "JacksonTester.write().getJson()" são diferentes,
-    // o que acaba criando um erro na assertiva, mesmo que ambos tenham todos os campos no JSON.
+    // Serializa o objeto "pagedResponse" para comparar com o retorno da rota. Não
+    // utilizamos a propriedade "JacksonTester<>" como
+    // em alguns outros métodos, pois a ordem dos campos na serializadão do
+    // "ObjectMapper" e do "JacksonTester.write().getJson()" são diferentes,
+    // o que acaba criando um erro na assertiva, mesmo que ambos tenham todos os
+    // campos no JSON.
 
     assertThat(response.getContentAsString()).isEqualTo(jsonPage);
   }
@@ -213,10 +214,11 @@ public class DestinationControllerTest {
       }
     });
     var response = mvc.perform(builder
-        .file(createMockMultipartFile())
+        .file(createMockMultipartFile_01())
+        .file(createMockMultipartFile_02())
         .param(this.idField, this.id)
         .param(this.nameField, this.name)
-        .param(this.priceField, String.valueOf(this.price)))
+        .param(this.targetField, this.target))
         .andReturn().getResponse();
     ;
 
@@ -245,16 +247,25 @@ public class DestinationControllerTest {
     assertThat(response.getStatus()).isEqualTo(HttpStatus.NO_CONTENT.value());
   }
 
-  MockMultipartFile createMockMultipartFile() {
+  MockMultipartFile createMockMultipartFile_01() {
     return new MockMultipartFile(
-        this.pictureField,
+        this.imageField1,
         "teste.png",
         MediaType.IMAGE_PNG_VALUE,
         "Hello, World!".getBytes());
   }
 
+  MockMultipartFile createMockMultipartFile_02() {
+    return new MockMultipartFile(
+        this.imageField2,
+        "image.png",
+        MediaType.IMAGE_PNG_VALUE,
+        "Hello World".getBytes());
+  }
+
   Destination createDestinationEntity() throws NumberFormatException, IOException {
-    return new Destination(Long.valueOf(this.id), createMockMultipartFile().getBytes(), this.name,
-        BigDecimal.valueOf(this.price), true);
+    return new Destination(Long.valueOf(this.id), createMockMultipartFile_01().getBytes(),
+        createMockMultipartFile_02().getBytes(), this.name,
+        this.target, this.description, true);
   }
 }

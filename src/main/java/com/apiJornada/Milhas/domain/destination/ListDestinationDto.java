@@ -1,14 +1,15 @@
 package com.apiJornada.Milhas.domain.destination;
 
-import java.math.BigDecimal;
-
 public record ListDestinationDto(
     Long id,
-    byte[] picture,
+    byte[] imageOne,
+    byte[] imageTwo,
     String name,
-    BigDecimal price) {
+    String target,
+    String description) {
 
   public ListDestinationDto(Destination entity) {
-    this(entity.getId(), entity.getPicture(), entity.getName(), entity.getPrice());
+    this(entity.getId(), entity.getImageOne(), entity.getImageTwo(), entity.getName(), entity.getTarget(),
+        entity.getDescription());
   }
 }

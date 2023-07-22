@@ -1,7 +1,6 @@
 package com.apiJornada.Milhas.domain.destination;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,29 +24,41 @@ public class Destination {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private byte[] picture;
+  private byte[] imageOne;
+  
+  private byte[] imageTwo;
 
   private String name;
 
-  private BigDecimal price;
+  private String target;
+
+  private String description;
 
   private Boolean active = true;
 
   public Destination(CreateDestinationDto dto) throws IOException {
-    this.picture = dto.picture().getBytes();
+    this.imageOne = dto.imageOne().getBytes();
+    this.imageTwo = dto.imageTwo().getBytes();
     this.name = dto.name();
-    this.price = dto.price();
+    this.target = dto.target();
+    this.description = dto.description();
   }
 
   public void update(UpdateDestinationDto upDto) throws IOException {
-    if(upDto.picture() != null){
-      this.picture = upDto.picture().getBytes();
+    if(upDto.imageOne() != null){
+      this.imageOne = upDto.imageOne().getBytes();
+    }
+    if(upDto.imageTwo() != null){
+      this.imageTwo = upDto.imageTwo().getBytes();
     }
     if(upDto.name() != null){
       this.name = upDto.name();
     }
-    if(upDto.price() != null){
-      this.price = upDto.price();
+    if(upDto.target() != null){
+      this.target = upDto.target();
+    }
+    if(upDto.description() != null){
+      this.description = upDto.description();
     }
   }
 

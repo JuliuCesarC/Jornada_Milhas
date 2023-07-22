@@ -4,7 +4,7 @@ create;
 
 SELECT * FROM flyway_schema_history;
 
-delete from flyway_schema_history where installed_rank = 7;
+delete from flyway_schema_history where installed_rank = 4;
 
 delete from flyway_schema_history where success = 0;
 
@@ -21,5 +21,11 @@ SELECT * FROM destination;
 SELECT * FROM destination WHERE name LIKE 'natal r%';
 
 
+
+alter table destination add price boolean;
+alter table destination change image_1 picture LONGBLOB not null;
+alter table destination drop column image_2;
+alter table destination drop column target;
+alter table destination drop column description;
 
 
