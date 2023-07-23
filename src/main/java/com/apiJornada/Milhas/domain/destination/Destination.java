@@ -32,7 +32,7 @@ public class Destination {
 
   private String target;
 
-  private String description;
+  private String destinationDescription;
 
   private Boolean active = true;
 
@@ -41,7 +41,7 @@ public class Destination {
     this.imageTwo = dto.imageTwo().getBytes();
     this.name = dto.name();
     this.target = dto.target();
-    this.description = dto.description();
+    this.destinationDescription = dto.destinationDescription();
   }
 
   public void update(UpdateDestinationDto upDto) throws IOException {
@@ -57,8 +57,8 @@ public class Destination {
     if(upDto.target() != null){
       this.target = upDto.target();
     }
-    if(upDto.description() != null){
-      this.description = upDto.description();
+    if(upDto.destinationDescription() != null){
+      this.destinationDescription = upDto.destinationDescription();
     }
   }
 

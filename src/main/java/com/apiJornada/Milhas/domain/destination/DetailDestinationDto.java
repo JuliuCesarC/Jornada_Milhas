@@ -6,11 +6,11 @@ public record DetailDestinationDto(
     byte[] image2,
     String name,
     String target,
-    String description,
+    String destinationDescription,
     Boolean active) {
   public DetailDestinationDto(Destination entity) {
     this(entity.getId(), entity.getImageOne(), entity.getImageTwo(), entity.getName(), entity.getTarget(),
-        entity.getDescription(), entity.getActive());
+        entity.getDestinationDescription(), entity.getActive());
   }
 
 }

@@ -25,6 +25,7 @@ import com.apiJornada.Milhas.domain.destination.Destination;
 import com.apiJornada.Milhas.domain.destination.DestinationRepository;
 import com.apiJornada.Milhas.domain.destination.DetailDestinationDto;
 import com.apiJornada.Milhas.domain.destination.ListDestinationDto;
+import com.apiJornada.Milhas.domain.destination.OpenAiGPTService;
 import com.apiJornada.Milhas.domain.destination.UpdateDestinationDto;
 
 import jakarta.transaction.Transactional;
@@ -32,23 +33,38 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("destinos")
-@CrossOrigin("http://127.0.0.1:5500")
 public class DestinationController {
 
   @Autowired
   private DestinationRepository repositoryDestination;
 
+  @Autowired
+  private OpenAiGPTService serviceGpt;
+
   @PostMapping(consumes = { "multipart/form-data" })
   @Transactional
   public ResponseEntity<String> createDestination(@Valid CreateDestinationDto dto, UriComponentsBuilder uriBuilder)
       throws IOException {
-    var destination = new Destination(dto);
-    repositoryDestination.save(destination);
 
-    var uri = uriBuilder.path("/destinos/{id}").buildAndExpand(destination.getId()).toUri();
+        System.out.println(serviceGpt.createDestinationDescription(dto.name()));
+
+    var uri = uriBuilder.path("/destinos/{id}").buildAndExpand("77").toUri();
 
     return ResponseEntity.created(uri).build();
   }
+  // @PostMapping(consumes = { "multipart/form-data" })
+  // @Transactional
+  // public ResponseEntity<String> createDestination(@Valid CreateDestinationDto
+  // dto, UriComponentsBuilder uriBuilder)
+  // throws IOException {
+  // var destination = new Destination(dto);
+  // repositoryDestination.save(destination);
+
+  // var uri =
+  // uriBuilder.path("/destinos/{id}").buildAndExpand(destination.getId()).toUri();
+
+  // return ResponseEntity.created(uri).build();
+  // }
 
   @GetMapping("/buscar")
   public ResponseEntity<Page<ListDestinationDto>> searchByNameDestination(

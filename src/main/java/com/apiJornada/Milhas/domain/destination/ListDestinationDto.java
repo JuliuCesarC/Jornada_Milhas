@@ -6,10 +6,10 @@ public record ListDestinationDto(
     byte[] imageTwo,
     String name,
     String target,
-    String description) {
+    String destinationDescription) {
 
   public ListDestinationDto(Destination entity) {
     this(entity.getId(), entity.getImageOne(), entity.getImageTwo(), entity.getName(), entity.getTarget(),
-        entity.getDescription());
+        entity.getDestinationDescription());
   }
 }

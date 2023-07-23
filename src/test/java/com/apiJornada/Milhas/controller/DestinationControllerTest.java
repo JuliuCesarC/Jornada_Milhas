@@ -63,8 +63,8 @@ public class DestinationControllerTest {
   private final String idField = "id";
   private final String nameField = "name";
   private final String targetField = "target";
-  private final String imageField1 = "image1";
-  private final String imageField2 = "image2";
+  private final String imageField1 = "imageOne";
+  private final String imageField2 = "imageTwo";
 
   @Test
   @DisplayName("Deveria devolver código http 415 quando não enviado o Media Type correto.")
