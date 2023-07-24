@@ -4,7 +4,7 @@ create;
 
 SELECT * FROM flyway_schema_history;
 
-delete from flyway_schema_history where installed_rank = 4;
+delete from flyway_schema_history where installed_rank = 5;
 
 delete from flyway_schema_history where success = 0;
 
@@ -28,4 +28,5 @@ alter table destination drop column image_2;
 alter table destination drop column target;
 alter table destination drop column description;
 
+alter table destination change destination_description description varchar(220);
 

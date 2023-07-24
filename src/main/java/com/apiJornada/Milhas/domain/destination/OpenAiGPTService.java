@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 import com.theokanning.openai.completion.chat.ChatCompletionRequest;
 import com.theokanning.openai.completion.chat.ChatMessage;
 import com.theokanning.openai.service.OpenAiService;
@@ -18,10 +19,9 @@ public class OpenAiGPTService {
 
   private final String model = "gpt-3.5-turbo";
 
-  // private final String PROMPT = "Faça um resumo sobre CITY_NAME enfatizando o porque este lugar é incrível. Utilize uma linguagem informal e até 100 caracteres no máximo em cada parágrafo. Crie 2 parágrafos neste resumo.";
-  private final String PROMPT = "Faça um resumo sobre CITY_NAME enfatizando os principais motivos para visitar este lugar. Utilize uma linguagem informal e até 100 caracteres no máximo em cada parágrafo. Crie 2 parágrafos neste resumo.";
+  private final String PROMPT = "Faça um resumo sobre CITY_NAME enfatizando os principais motivos para visitar este lugar. Utilize uma linguagem informal e o resumo deve conter no máximo 300 caracteres. Não comece o texto com o nome CITY_NAME e evite escrever em primeira pessoa.";
 
-  public ChatMessage createDestinationDescription(String cityName) {
+  public ChatCompletionChoice createDestinationDescription(String cityName) {
     String promptWithDestination = PROMPT.replace("CITY_NAME", cityName);
     OpenAiService service = new OpenAiService(apiKey);
 
@@ -32,9 +32,11 @@ public class OpenAiGPTService {
     ChatCompletionRequest completionRequest = ChatCompletionRequest.builder()
         .model(model)
         .messages(list)
-        .maxTokens(200)
+        .maxTokens(130)
+        // .temperature(0.4)
+        // .topP(0.5)
         .build();
 
-    return service.createChatCompletion(completionRequest).getChoices().get(0).getMessage();
+    return service.createChatCompletion(completionRequest).getChoices().get(0);
   }
 }

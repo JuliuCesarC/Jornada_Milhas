@@ -8,12 +8,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,9 +24,11 @@ import com.apiJornada.Milhas.domain.destination.CreateDestinationDto;
 import com.apiJornada.Milhas.domain.destination.Destination;
 import com.apiJornada.Milhas.domain.destination.DestinationRepository;
 import com.apiJornada.Milhas.domain.destination.DetailDestinationDto;
+import com.apiJornada.Milhas.domain.destination.GenerateDestinationDescriptionDto;
 import com.apiJornada.Milhas.domain.destination.ListDestinationDto;
 import com.apiJornada.Milhas.domain.destination.OpenAiGPTService;
 import com.apiJornada.Milhas.domain.destination.UpdateDestinationDto;
+import com.theokanning.openai.completion.chat.ChatCompletionChoice;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -43,28 +45,24 @@ public class DestinationController {
 
   @PostMapping(consumes = { "multipart/form-data" })
   @Transactional
-  public ResponseEntity<String> createDestination(@Valid CreateDestinationDto dto, UriComponentsBuilder uriBuilder)
-      throws IOException {
+  public ResponseEntity<String> createDestination(@Valid CreateDestinationDto
+  dto, UriComponentsBuilder uriBuilder)
+  throws IOException {
+  var destination = new Destination(dto);
+  repositoryDestination.save(destination);
 
-        System.out.println(serviceGpt.createDestinationDescription(dto.name()));
+  var uri =
+  uriBuilder.path("/destinos/{id}").buildAndExpand(destination.getId()).toUri();
 
-    var uri = uriBuilder.path("/destinos/{id}").buildAndExpand("77").toUri();
-
-    return ResponseEntity.created(uri).build();
+  return ResponseEntity.created(uri).build();
   }
-  // @PostMapping(consumes = { "multipart/form-data" })
-  // @Transactional
-  // public ResponseEntity<String> createDestination(@Valid CreateDestinationDto
-  // dto, UriComponentsBuilder uriBuilder)
-  // throws IOException {
-  // var destination = new Destination(dto);
-  // repositoryDestination.save(destination);
 
-  // var uri =
-  // uriBuilder.path("/destinos/{id}").buildAndExpand(destination.getId()).toUri();
+  @PostMapping("/gerar-descricao")
+  public ResponseEntity<ChatCompletionChoice> generateDescription(@Valid @RequestBody GenerateDestinationDescriptionDto dto)
+  throws IOException {
 
-  // return ResponseEntity.created(uri).build();
-  // }
+  return ResponseEntity.ok(serviceGpt.createDestinationDescription(dto.destinationName()));
+  }
 
   @GetMapping("/buscar")
   public ResponseEntity<Page<ListDestinationDto>> searchByNameDestination(

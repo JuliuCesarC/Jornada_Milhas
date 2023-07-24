@@ -36,7 +36,10 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import com.apiJornada.Milhas.domain.destination.Destination;
 import com.apiJornada.Milhas.domain.destination.DestinationRepository;
 import com.apiJornada.Milhas.domain.destination.ListDestinationDto;
+import com.apiJornada.Milhas.domain.destination.OpenAiGPTService;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.theokanning.openai.completion.chat.ChatCompletionChoice;
+import com.theokanning.openai.completion.chat.ChatMessage;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -51,20 +54,26 @@ public class DestinationControllerTest {
 
   @MockBean
   private DestinationRepository repositoryDestination;
+  
+  @MockBean
+  private OpenAiGPTService serviceGpt;
 
   private final String URL = "/destinos";
+  private final String URL_GENERATE = "/destinos/gerar-descricao";
   private final String URL_SEARCH = "/destinos/buscar";
   private final String URL_ROUTE_ID = "/destinos/";
 
   private final String id = "111";
   private final String name = "paris";
-  private final String target = "1111111111";
-  private final String description = "111111111111111";
+  private final String target = "Lorem ipsum dolor";
+  private final String destinationDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
+  private final String chatUser = "assistant";
   private final String idField = "id";
   private final String nameField = "name";
   private final String targetField = "target";
   private final String imageField1 = "imageOne";
   private final String imageField2 = "imageTwo";
+  private final String descriptionField = "destinationDescription";
 
   @Test
   @DisplayName("Deveria devolver código http 415 quando não enviado o Media Type correto.")
@@ -92,10 +101,41 @@ public class DestinationControllerTest {
         .file(createMockMultipartFile_01())
         .file(createMockMultipartFile_02())
         .param(this.nameField, this.name)
-        .param(this.targetField, this.target))
+        .param(this.targetField, this.target)
+        .param(this.descriptionField, this.destinationDescription)
+        )
         .andReturn().getResponse();
 
     assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
+  }
+
+
+
+  @Test
+  @DisplayName("Deveria devolver código http 400 quando não enviado informação de destino.")
+  void testGenerateDescription_01() throws Exception {
+    var response = mvc.perform(post(URL_GENERATE)).andReturn().getResponse();
+
+    assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+  }
+  @Test
+  @DisplayName("Deveria devolver código http 200 quando enviado a informação de destino.")
+  void testGenerateDescription_02() throws Exception {
+    ChatMessage message = new ChatMessage(chatUser, destinationDescription);
+    var chatCompletion = new ChatCompletionChoice();
+    chatCompletion.setIndex(0);
+    chatCompletion.setMessage(message);
+    chatCompletion.setFinishReason("stop");
+    when(serviceGpt.createDestinationDescription(any())).thenReturn(chatCompletion);
+
+    var destinationNameJson = "{\"name\": \"1111\"}";
+    var response = mvc.perform(post(URL_GENERATE).contentType(MediaType.APPLICATION_JSON).content(destinationNameJson)).andReturn().getResponse();
+
+    assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+
+    ObjectMapper objectMapper = new ObjectMapper();
+    var responseJson = objectMapper.readValue(response.getContentAsString(), ChatCompletionChoice.class);
+    assertThat(responseJson).isEqualTo(chatCompletion);
   }
 
   @Test
@@ -174,8 +214,8 @@ public class DestinationControllerTest {
     var response = mvc.perform(get(URL_ROUTE_ID + id)).andReturn().getResponse();
 
     assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-    var responseJson = listDestinationJson.write(listDestination).getJson();
-    assertThat(response.getContentAsString()).isEqualTo(responseJson);
+    var expectedJson = listDestinationJson.write(listDestination).getJson();
+    assertThat(response.getContentAsString()).isEqualTo(expectedJson);
   }
 
   @Test
@@ -218,13 +258,14 @@ public class DestinationControllerTest {
         .file(createMockMultipartFile_02())
         .param(this.idField, this.id)
         .param(this.nameField, this.name)
-        .param(this.targetField, this.target))
+        .param(this.targetField, this.target)
+        .param(this.descriptionField, this.destinationDescription))
         .andReturn().getResponse();
     ;
 
     assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-    var responseJson = listDestinationJson.write(listTestimonial).getJson();
-    assertThat(response.getContentAsString()).isEqualTo(responseJson);
+    var expectedJson = listDestinationJson.write(listTestimonial).getJson();
+    assertThat(response.getContentAsString()).isEqualTo(expectedJson);
   }
 
   @Test
@@ -266,6 +307,6 @@ public class DestinationControllerTest {
   Destination createDestinationEntity() throws NumberFormatException, IOException {
     return new Destination(Long.valueOf(this.id), createMockMultipartFile_01().getBytes(),
         createMockMultipartFile_02().getBytes(), this.name,
-        this.target, this.description, true);
+        this.target, this.destinationDescription, true);
   }
 }
