@@ -45,29 +45,36 @@ public class DestinationController {
 
   @PostMapping(consumes = { "multipart/form-data" })
   @Transactional
-  public ResponseEntity<String> createDestination(@Valid CreateDestinationDto
-  dto, UriComponentsBuilder uriBuilder)
-  throws IOException {
-  var destination = new Destination(dto);
-  repositoryDestination.save(destination);
+  public ResponseEntity<String> createDestination(@Valid CreateDestinationDto dto, UriComponentsBuilder uriBuilder)
+      throws IOException {
+    var destination = new Destination(dto);
+    repositoryDestination.save(destination);
 
-  var uri =
-  uriBuilder.path("/destinos/{id}").buildAndExpand(destination.getId()).toUri();
+    var uri = uriBuilder.path("/destinos/{id}").buildAndExpand(destination.getId()).toUri();
 
-  return ResponseEntity.created(uri).build();
+    return ResponseEntity.created(uri).build();
   }
 
   @PostMapping("/gerar-descricao")
-  public ResponseEntity<ChatCompletionChoice> generateDescription(@Valid @RequestBody GenerateDestinationDescriptionDto dto)
-  throws IOException {
+  public ResponseEntity<ChatCompletionChoice> generateDescription(
+      @Valid @RequestBody GenerateDestinationDescriptionDto dto)
+      throws IOException {
 
-  return ResponseEntity.ok(serviceGpt.createDestinationDescription(dto.destinationName()));
+    return ResponseEntity.ok(serviceGpt.createDestinationDescription(dto.destinationName()));
+  }
+
+  @GetMapping
+  public ResponseEntity<Page<ListDestinationDto>> listDestination(
+      @PageableDefault(size = 6, sort = { "name" }) Pageable pagination) {
+    var listDto = repositoryDestination.findAllByActiveTrue(pagination);
+
+    return ResponseEntity.ok(listDto);
   }
 
   @GetMapping("/buscar")
-  public ResponseEntity<Page<ListDestinationDto>> searchByNameDestination(
+  public ResponseEntity<Page<DetailDestinationDto>> searchByNameDestination(
       @RequestParam String name,
-      @PageableDefault(size = 2, sort = { "name" }) Pageable pagination) {
+      @PageableDefault(sort = { "name" }) Pageable pagination) {
     var listDto = repositoryDestination.findAllByNameLikeAndActiveTrue(name + "%", pagination);
 
     if (listDto.getContent().size() < 1) {
@@ -77,19 +84,11 @@ public class DestinationController {
     return ResponseEntity.ok(listDto);
   }
 
-  @GetMapping
-  public ResponseEntity<Page<ListDestinationDto>> listDestination(
-      @PageableDefault(size = 10, sort = { "name" }) Pageable pagination) {
-    var listDto = repositoryDestination.findAllByActiveTrue(pagination);
-
-    return ResponseEntity.ok(listDto);
-  }
-
   @GetMapping("/{id}")
-  public ResponseEntity<ListDestinationDto> searchDestinationById(@PathVariable Long id) {
+  public ResponseEntity<DetailDestinationDto> searchDestinationById(@PathVariable Long id) {
     var entity = repositoryDestination.findByIdAndActiveTrue(id);
 
-    return ResponseEntity.ok(new ListDestinationDto(entity));
+    return ResponseEntity.ok(new DetailDestinationDto(entity));
   }
 
   @GetMapping("/detail")

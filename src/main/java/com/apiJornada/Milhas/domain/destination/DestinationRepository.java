@@ -10,6 +10,6 @@ public interface DestinationRepository extends JpaRepository<Destination, Long>{
 
 	Destination findByIdAndActiveTrue(Long id);
 
-  Page<ListDestinationDto> findAllByNameLikeAndActiveTrue(String name, Pageable pagination);
+  Page<DetailDestinationDto> findAllByNameLikeAndActiveTrue(String name, Pageable pagination);
   
 }

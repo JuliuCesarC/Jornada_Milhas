@@ -1,0 +1,1 @@
+alter table destination change price price decimal(10,2) not null;

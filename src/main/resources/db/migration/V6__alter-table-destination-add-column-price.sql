@@ -1,0 +1,1 @@
+alter table destination add price decimal(10,2);

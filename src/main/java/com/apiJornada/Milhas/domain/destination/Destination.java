@@ -1,6 +1,7 @@
 package com.apiJornada.Milhas.domain.destination;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -25,7 +26,7 @@ public class Destination {
   private Long id;
 
   private byte[] imageOne;
-  
+
   private byte[] imageTwo;
 
   private String name;
@@ -33,6 +34,8 @@ public class Destination {
   private String target;
 
   private String destinationDescription;
+
+  private BigDecimal price;
 
   private Boolean active = true;
 
@@ -42,27 +45,31 @@ public class Destination {
     this.name = dto.name();
     this.target = dto.target();
     this.destinationDescription = dto.destinationDescription();
+    this.price = dto.price();
   }
 
   public void update(UpdateDestinationDto upDto) throws IOException {
-    if(upDto.imageOne() != null){
+    if (upDto.imageOne() != null) {
       this.imageOne = upDto.imageOne().getBytes();
     }
-    if(upDto.imageTwo() != null){
+    if (upDto.imageTwo() != null) {
       this.imageTwo = upDto.imageTwo().getBytes();
     }
-    if(upDto.name() != null){
+    if (upDto.name() != null) {
       this.name = upDto.name();
     }
-    if(upDto.target() != null){
+    if (upDto.target() != null) {
       this.target = upDto.target();
     }
-    if(upDto.destinationDescription() != null){
+    if (upDto.destinationDescription() != null) {
       this.destinationDescription = upDto.destinationDescription();
+    }
+    if (upDto.price() != null) {
+      this.price = upDto.price();
     }
   }
 
-  public void disable(){
+  public void disable() {
     this.active = false;
   }
 }

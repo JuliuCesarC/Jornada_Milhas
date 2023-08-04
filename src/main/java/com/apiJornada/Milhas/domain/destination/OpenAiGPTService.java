@@ -19,10 +19,11 @@ public class OpenAiGPTService {
 
   private final String model = "gpt-3.5-turbo";
 
-  private final String PROMPT = "Faça um resumo sobre CITY_NAME enfatizando os principais motivos para visitar este lugar. Utilize uma linguagem informal e o resumo deve conter no máximo 300 caracteres. Não comece o texto com o nome CITY_NAME e evite escrever em primeira pessoa.";
+  private final String PROMPT = "Faça um resumo sobre CITY_NAME enfatizando os principais motivos para visitar este lugar. Utilize uma linguagem informal e o resumo deve conter no máximo 300 caracteres. Não comece o texto com o nome CITY_NAME e evite escrever em primeira pessoa. Não utilize palavras de baixo calão ou com teor sexual.";
 
   public ChatCompletionChoice createDestinationDescription(String cityName) {
     String promptWithDestination = PROMPT.replace("CITY_NAME", cityName);
+    
     OpenAiService service = new OpenAiService(apiKey);
 
     List<ChatMessage> list = new ArrayList<>();

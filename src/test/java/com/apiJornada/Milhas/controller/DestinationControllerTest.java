@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -35,6 +36,7 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import com.apiJornada.Milhas.domain.destination.Destination;
 import com.apiJornada.Milhas.domain.destination.DestinationRepository;
+import com.apiJornada.Milhas.domain.destination.DetailDestinationDto;
 import com.apiJornada.Milhas.domain.destination.ListDestinationDto;
 import com.apiJornada.Milhas.domain.destination.OpenAiGPTService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,6 +54,9 @@ public class DestinationControllerTest {
   @Autowired
   private JacksonTester<ListDestinationDto> listDestinationJson;
 
+  @Autowired
+  private JacksonTester<DetailDestinationDto> detailDestinationJson;
+
   @MockBean
   private DestinationRepository repositoryDestination;
   
@@ -67,6 +72,7 @@ public class DestinationControllerTest {
   private final String name = "paris";
   private final String target = "Lorem ipsum dolor";
   private final String destinationDescription = "Lorem ipsum dolor sit amet, consectetur adipiscing elit.";
+  private final String price = "200.8";
   private final String chatUser = "assistant";
   private final String idField = "id";
   private final String nameField = "name";
@@ -74,6 +80,7 @@ public class DestinationControllerTest {
   private final String imageField1 = "imageOne";
   private final String imageField2 = "imageTwo";
   private final String descriptionField = "destinationDescription";
+  private final String priceField = "price";
 
   @Test
   @DisplayName("Deveria devolver código http 415 quando não enviado o Media Type correto.")
@@ -103,6 +110,7 @@ public class DestinationControllerTest {
         .param(this.nameField, this.name)
         .param(this.targetField, this.target)
         .param(this.descriptionField, this.destinationDescription)
+        .param(this.priceField, this.price)
         )
         .andReturn().getResponse();
 
@@ -161,7 +169,7 @@ public class DestinationControllerTest {
     final String QUERY_PARAM = "?name=";
     final String URL_WHIT_QUERY_PARAM = URL_SEARCH + QUERY_PARAM + name;
 
-    PageImpl<ListDestinationDto> pagedResponse = new PageImpl<>(new ArrayList<>());
+    PageImpl<DetailDestinationDto> pagedResponse = new PageImpl<>(new ArrayList<>());
     when(repositoryDestination.findAllByNameLikeAndActiveTrue(any(), any())).thenReturn(pagedResponse);
 
     var response = mvc.perform(get(URL_WHIT_QUERY_PARAM)).andReturn().getResponse();
@@ -175,8 +183,8 @@ public class DestinationControllerTest {
     final String QUERY_PARAM = "?name=";
     final String URL_WHIT_QUERY_PARAM = URL_SEARCH + QUERY_PARAM + name;
 
-    Page<ListDestinationDto> pagedResponse = new PageImpl<>(
-        List.of(new ListDestinationDto(createDestinationEntity())));
+    Page<DetailDestinationDto> pagedResponse = new PageImpl<>(
+        List.of(new DetailDestinationDto(createDestinationEntity())));
     when(repositoryDestination.findAllByNameLikeAndActiveTrue(any(), any())).thenReturn(pagedResponse);
 
     var response = mvc.perform(get(URL_WHIT_QUERY_PARAM)).andReturn().getResponse();
@@ -207,14 +215,14 @@ public class DestinationControllerTest {
   @DisplayName("Deveria devolver código http 200 quando id informado estiver correto.")
   void testSearchDestinationById_02() throws Exception {
     Destination destination = createDestinationEntity();
-    var listDestination = new ListDestinationDto(destination);
+    var detailDestination = new DetailDestinationDto(destination);
 
     when(repositoryDestination.findByIdAndActiveTrue(any())).thenReturn(destination);
 
     var response = mvc.perform(get(URL_ROUTE_ID + id)).andReturn().getResponse();
 
     assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-    var expectedJson = listDestinationJson.write(listDestination).getJson();
+    var expectedJson = detailDestinationJson.write(detailDestination).getJson();
     assertThat(response.getContentAsString()).isEqualTo(expectedJson);
   }
 
@@ -259,7 +267,8 @@ public class DestinationControllerTest {
         .param(this.idField, this.id)
         .param(this.nameField, this.name)
         .param(this.targetField, this.target)
-        .param(this.descriptionField, this.destinationDescription))
+        .param(this.descriptionField, this.destinationDescription)
+        .param(this.priceField, this.price))
         .andReturn().getResponse();
     ;
 
@@ -307,6 +316,6 @@ public class DestinationControllerTest {
   Destination createDestinationEntity() throws NumberFormatException, IOException {
     return new Destination(Long.valueOf(this.id), createMockMultipartFile_01().getBytes(),
         createMockMultipartFile_02().getBytes(), this.name,
-        this.target, this.destinationDescription, true);
+        this.target, this.destinationDescription, new BigDecimal(this.price), true);
   }
 }
