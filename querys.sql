@@ -14,6 +14,10 @@ select * from client_testimonial;
 
 delete from client_testimonial where id > 0;
 
+UPDATE client_testimonial
+SET active = 1
+WHERE id = 3;
+
 -- Destination --------------
 
 SELECT * FROM destination;

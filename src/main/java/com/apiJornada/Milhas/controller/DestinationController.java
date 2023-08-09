@@ -72,9 +72,9 @@ public class DestinationController {
   }
 
   @GetMapping("/buscar")
-  public ResponseEntity<Page<DetailDestinationDto>> searchByNameDestination(
+  public ResponseEntity<Page<ListDestinationDto>> searchByNameDestination(
       @RequestParam String name,
-      @PageableDefault(sort = { "name" }) Pageable pagination) {
+      @PageableDefault(size = 6, sort = { "name" }) Pageable pagination) {
     var listDto = repositoryDestination.findAllByNameLikeAndActiveTrue(name + "%", pagination);
 
     if (listDto.getContent().size() < 1) {

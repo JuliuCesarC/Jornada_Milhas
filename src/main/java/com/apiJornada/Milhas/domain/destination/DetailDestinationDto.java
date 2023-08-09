@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 
 public record DetailDestinationDto(
     Long id,
-    byte[] image1,
-    byte[] image2,
+    byte[] imageOne,
+    byte[] imageTwo,
     String name,
     String target,
     String destinationDescription,

@@ -169,7 +169,7 @@ public class DestinationControllerTest {
     final String QUERY_PARAM = "?name=";
     final String URL_WHIT_QUERY_PARAM = URL_SEARCH + QUERY_PARAM + name;
 
-    PageImpl<DetailDestinationDto> pagedResponse = new PageImpl<>(new ArrayList<>());
+    PageImpl<ListDestinationDto> pagedResponse = new PageImpl<>(new ArrayList<>());
     when(repositoryDestination.findAllByNameLikeAndActiveTrue(any(), any())).thenReturn(pagedResponse);
 
     var response = mvc.perform(get(URL_WHIT_QUERY_PARAM)).andReturn().getResponse();
@@ -183,8 +183,8 @@ public class DestinationControllerTest {
     final String QUERY_PARAM = "?name=";
     final String URL_WHIT_QUERY_PARAM = URL_SEARCH + QUERY_PARAM + name;
 
-    Page<DetailDestinationDto> pagedResponse = new PageImpl<>(
-        List.of(new DetailDestinationDto(createDestinationEntity())));
+    Page<ListDestinationDto> pagedResponse = new PageImpl<>(
+        List.of(new ListDestinationDto(createDestinationEntity())));
     when(repositoryDestination.findAllByNameLikeAndActiveTrue(any(), any())).thenReturn(pagedResponse);
 
     var response = mvc.perform(get(URL_WHIT_QUERY_PARAM)).andReturn().getResponse();
