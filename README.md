@@ -18,6 +18,12 @@ O intuito desse projeto é que o participante se desafie a trabalhar com ferrame
 
 Venho utilizando as tecnologias Java e Spring Boot por algum tempo e tenho gostado bastante do resultado proporcionado por elas. Essa dupla possui uma enormidade de vantagens ao qual eu poderia destacar a excelente integração com os bancos de dados, a simplicidade para criar a aplicação, a segurança tanto do java como do Spring, a injeção de dependência, entre outros. Além de tudo isso, a linguagem java é mundialmente utilizada por diversas empresas, o que a torna uma excelente escolha para se especializar.
 
+### OpenAi
+
+Um dos desafios do projeto era implementar a api do ChatGpt na aplicação, para que os **textos de descrição do destino** caso não fossem preenchidos, a inteligencia artificial iria criar eles. Porem para que o cliente pudesse ter um controle maior, criei uma rota separada para essa tarefa, de forma que o usuário possa requisitar um texto e fazer alterações nele caso necessario (por experiencia própria sei que nem sempre o texto vem com uma qualidade legal), e se satisfeito, cadastre o destino com o texto revisado.
+
+O processo de implementar o ChatGpt foi mais simples do que esperava. A OpenAi disponibiliza alguma bibliotecas para cada tipo de linguagem, e para a de java é a [openai-java](https://github.com/TheoKanning/openai-java) que foi feita pelo [TheoKanning](https://github.com/TheoKanning). Dentro do repositório temos alguns e exemplos e foi necessario apenas criar a classe de serviço [OpenAiGPTService](https://github.com/JuliuCesarC/Jornada_Milhas/blob/main/src/main/java/com/apiJornada/Milhas/domain/destination/OpenAiGPTService.java), e dentro dela colocar os códigos do tutorial com as alterações necessárias.
+
 ### Unit Test
 
 Ao criar uma aplicação com o Spring Boot ele ja traz diversos pacotes de testes automatizados, como os pacotes **JUnit**, **Mockito**, **AssertJ**, entre outros. E com todas essas bibliotecas já previamente instaladas, temos um ambiente preparado para efetuar os testes, ao qual nesse projeto foi testado os dois controllers principais.
