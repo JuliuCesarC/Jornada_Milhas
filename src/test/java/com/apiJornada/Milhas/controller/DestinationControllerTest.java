@@ -59,7 +59,7 @@ public class DestinationControllerTest {
 
   @MockBean
   private DestinationRepository repositoryDestination;
-  
+
   @MockBean
   private OpenAiGPTService serviceGpt;
 
@@ -110,14 +110,11 @@ public class DestinationControllerTest {
         .param(this.nameField, this.name)
         .param(this.targetField, this.target)
         .param(this.descriptionField, this.destinationDescription)
-        .param(this.priceField, this.price)
-        )
+        .param(this.priceField, this.price))
         .andReturn().getResponse();
 
     assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
   }
-
-
 
   @Test
   @DisplayName("Deveria devolver código http 400 quando não enviado informação de destino.")
@@ -126,6 +123,7 @@ public class DestinationControllerTest {
 
     assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
   }
+
   @Test
   @DisplayName("Deveria devolver código http 200 quando enviado a informação de destino.")
   void testGenerateDescription_02() throws Exception {
@@ -137,7 +135,8 @@ public class DestinationControllerTest {
     when(serviceGpt.createDestinationDescription(any())).thenReturn(chatCompletion);
 
     var destinationNameJson = "{\"name\": \"1111\"}";
-    var response = mvc.perform(post(URL_GENERATE).contentType(MediaType.APPLICATION_JSON).content(destinationNameJson)).andReturn().getResponse();
+    var response = mvc.perform(post(URL_GENERATE).contentType(MediaType.APPLICATION_JSON).content(destinationNameJson))
+        .andReturn().getResponse();
 
     assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
 

@@ -83,6 +83,7 @@ public class DestinationController {
 
     return ResponseEntity.ok(listDto);
   }
+  
 
   @GetMapping("/{id}")
   public ResponseEntity<DetailDestinationDto> searchDestinationById(@PathVariable Long id) {
